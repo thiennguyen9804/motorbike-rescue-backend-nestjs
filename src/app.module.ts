@@ -26,17 +26,14 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   },
 });
 
+import { devicesModule } from './devices/devices.module';
+
 @Module({
   imports: [
+    devicesModule,
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [
-        databaseConfig,
-        authConfig,
-        appConfig,
-        mailConfig,
-        fileConfig,
-      ],
+      load: [databaseConfig, authConfig, appConfig, mailConfig, fileConfig],
       envFilePath: ['.env'],
     }),
     infrastructureDatabaseModule,
