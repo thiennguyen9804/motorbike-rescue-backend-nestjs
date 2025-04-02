@@ -10,13 +10,16 @@ export class CreateDevice1743498401382 implements MigrationInterface {
         CREATE TABLE "device" (
             "id" SERIAL PRIMARY KEY,
             "name" character varying NOT NULL,
-            "last_update" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            "status" integer DEFAULT 1,  -- 1 represents ONLINE status
-            "position" geometry(Point, 4326) NOT NULL,
-            "user_id" integer NOT NULL,
-            "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            CONSTRAINT "FK_device_user" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE CASCADE
+            "lastUpdate" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            "status" integer DEFAULT 0,
+            "position" geometry(Point, 4326) NOT NULL DEFAULT ST_SetSRID(ST_MakePoint(0, 0), 4326),
+            "userId" integer NOT NULL,
+            "role" integer DEFAULT 0,
+            "deviceKey" character varying UNIQUE NOT NULL,
+            "deviceToken" character varying NOT NULL,
+            "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            CONSTRAINT "FK_device_user" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE
         );
 
         CREATE INDEX "idx_device_position" ON "device" USING GIST ("position");

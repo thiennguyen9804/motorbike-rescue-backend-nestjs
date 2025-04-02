@@ -18,6 +18,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateDeviceDto } from './dto/create-device.dto';
 import { DeviceOwnershipGuard } from './device-ownership.guard';
+import crypto from 'crypto';
+import { DeviceRole } from './domain/device-role.enum';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
@@ -36,22 +38,8 @@ import { DeviceOwnershipGuard } from './device-ownership.guard';
     join: {
       user: { eager: true },
     },
-    filter: [
-      {
-        field: 'is_admin',
-        operator: 'eq',
-        value: false,
-      },
-    ],
-    sort: [{ field: 'createdAt', order: 'ASC' }],
   },
-  params: {
-    id: {
-      field: 'id',
-      type: 'number',
-      primary: true,
-    },
-  },
+
   routes: {
     exclude: ['replaceOneBase', 'recoverOneBase'],
   },
@@ -62,7 +50,7 @@ export class DevicesController implements CrudController<DeviceEntity> {
   constructor(
     public service: DevicesService,
     @InjectRepository(DeviceEntity) public repo: Repository<DeviceEntity>,
-  ) { }
+  ) {}
 
   get base(): CrudController<DeviceEntity> {
     return this;
@@ -76,25 +64,43 @@ export class DevicesController implements CrudController<DeviceEntity> {
     const user = request.user;
     const userId: number = user.id;
     const userRoleId: number = user.role.id;
-    const adminFilter: SCondition = { is_admin: false };
+    const adminFilter: SCondition = { role: DeviceRole.DEVICE };
+    let andSearch = req.parsed.search.$and;
 
     if (userRoleId !== RoleEnum.admin) {
-      const userIdFilter: SCondition = { user_id: { $eq: userId } };
+      const userIdFilter: SCondition = { userId: { $eq: userId } };
 
       if (req.parsed.search && '$and' in req.parsed.search) {
-        req.parsed.search.$and = [
+        andSearch = [
           ...(req.parsed.search.$and || []),
           userIdFilter,
           adminFilter,
         ];
       } else {
-        req.parsed.search = {
-          $and: [req.parsed.search || {}, userIdFilter, adminFilter],
-        };
+        andSearch = [userIdFilter, adminFilter];
       }
     }
 
-    return await this.service.getMany(req);
+    return await this.service.getMany({
+      ...req,
+      parsed: {
+        ...req.parsed,
+        search: {
+          $and: andSearch || [],
+        },
+        fields: [
+          'id',
+          'user',
+          'name',
+          'status',
+          'position',
+          'createdAt',
+          'updatedAt',
+          'userId',
+          'lastUpdate',
+        ],
+      },
+    });
   }
 
   @Override('getOneBase')
@@ -111,7 +117,7 @@ export class DevicesController implements CrudController<DeviceEntity> {
   ): Promise<DeviceEntity> {
     return await this.service.updateOne(req, {
       ...dto,
-      user: dto.user_id ? { id: dto.user_id } : undefined,
+      user: dto.userId ? { id: dto.userId } : undefined,
     });
   }
 
@@ -121,19 +127,15 @@ export class DevicesController implements CrudController<DeviceEntity> {
     @ParsedRequest() req: CrudRequest,
     @Request() request: any,
   ): Promise<DeviceEntity> {
-    // const device_pass = crypto
-    //   .createHash('md5')
-    //   .update(Math.random().toString())
-    //   .digest('hex');
-    // const device_hash = await bcrypt.hash(device_pass, 10);
+    const deviceToken = crypto.randomBytes(16).toString('hex');
 
-    // await this.repo.update(request.device.id, {
-    //   device_pass: device_hash,
-    // });
+    await this.repo.update(request.device.id, {
+      deviceToken: deviceToken,
+    });
 
     return {
       ...request.device,
-      //  device_pass: device_pass 
+      deviceToken: deviceToken,
     };
   }
 

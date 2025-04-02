@@ -8,11 +8,9 @@ import { DeviceEntity } from './infrastructure/persistence/relational/entities/d
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([DeviceEntity])
-  ],
+  imports: [TypeOrmModule.forFeature([DeviceEntity])],
   controllers: [DevicesController],
   providers: [DevicesService],
-  exports: [DevicesService,],
+  exports: [DevicesService],
 })
-export class devicesModule { }
+export class devicesModule {}

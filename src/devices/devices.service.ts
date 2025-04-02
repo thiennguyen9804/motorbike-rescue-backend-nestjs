@@ -6,9 +6,7 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class DevicesService extends TypeOrmCrudService<DeviceEntity> {
-  constructor(
-    @InjectRepository(DeviceEntity) repo: Repository<DeviceEntity>,
-  ) {
+  constructor(@InjectRepository(DeviceEntity) repo: Repository<DeviceEntity>) {
     super(repo);
   }
 }

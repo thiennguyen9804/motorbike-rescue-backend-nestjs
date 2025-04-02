@@ -12,4 +12,4 @@ export interface Geometry {
 
 export interface PostGISPoint extends Point {
   type: 'Point';
-} 
+}

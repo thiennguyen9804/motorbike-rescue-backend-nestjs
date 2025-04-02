@@ -1,8 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
-import { PostGISPoint } from '../../database/types/postgis.types';
-
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateDeviceDto {
   @ApiProperty({
@@ -14,15 +11,17 @@ export class CreateDeviceDto {
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty({
-    type: Number,
-    description: 'Device status (1 for ONLINE)',
-    default: 1,
-    example: 1,
-  })
-  @IsNumber()
-  @IsOptional()
-  status?: number;
+  // @ApiProperty({
+  //   type: String,
+  //   description: 'Device status (offline/online)',
+  //   default: 'offline',
+  //   example: 'online',
+  //   enum: ['offline', 'online']
+  // })
+  // @IsString()
+  // @IsEnum(['offline', 'online'])
+  // @IsOptional()
+  // status?: string;
 
   @ApiProperty({
     type: Number,
@@ -31,5 +30,5 @@ export class CreateDeviceDto {
   })
   @IsNumber()
   @IsNotEmpty()
-  user_id: number;
+  userId: number;
 }
