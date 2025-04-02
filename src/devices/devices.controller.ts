@@ -1,4 +1,4 @@
-import { Controller, Get, Request, UseGuards } from '@nestjs/common';
+import { Controller, ForbiddenException, Get, Request, UseGuards, Query } from '@nestjs/common';
 import {
   Crud,
   CrudController,
@@ -20,9 +20,12 @@ import { CreateDeviceDto } from './dto/create-device.dto';
 import { DeviceOwnershipGuard } from './device-ownership.guard';
 import crypto from 'crypto';
 import { DeviceRole } from './domain/device-role.enum';
+import { RolesGuard } from '../roles/roles.guard';
+import { Roles } from '../roles/roles.decorator';
+import { ScanDevicesDto } from './dto/scan-devices.dto';
 
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 @Crud({
   model: { type: DeviceEntity },
   dto: {
@@ -38,6 +41,13 @@ import { DeviceRole } from './domain/device-role.enum';
     join: {
       user: { eager: true },
     },
+    filter: [
+      {
+        field: 'role',
+        operator: 'eq',
+        value: '0',
+      },
+    ],
   },
 
   routes: {
@@ -50,13 +60,19 @@ export class DevicesController implements CrudController<DeviceEntity> {
   constructor(
     public service: DevicesService,
     @InjectRepository(DeviceEntity) public repo: Repository<DeviceEntity>,
-  ) {}
+  ) { }
 
   get base(): CrudController<DeviceEntity> {
     return this;
   }
 
+  @Get('scan')
+  async scanDevices(@Query() query: ScanDevicesDto) {
+    return this.service.scanNearbyDevices({ ...query, radius: 10000 });
+  }
+
   @Override('getManyBase')
+  @Roles(RoleEnum.admin)
   async ovGetManyBase(
     @ParsedRequest() req: CrudRequest,
     @Request() request: any,
@@ -64,7 +80,7 @@ export class DevicesController implements CrudController<DeviceEntity> {
     const user = request.user;
     const userId: number = user.id;
     const userRoleId: number = user.role.id;
-    const adminFilter: SCondition = { role: DeviceRole.DEVICE };
+    const adminFilter: SCondition = { role: { $eq: DeviceRole.DEVICE } };
     let andSearch = req.parsed.search.$and;
 
     if (userRoleId !== RoleEnum.admin) {
@@ -88,17 +104,6 @@ export class DevicesController implements CrudController<DeviceEntity> {
         search: {
           $and: andSearch || [],
         },
-        fields: [
-          'id',
-          'user',
-          'name',
-          'status',
-          'position',
-          'createdAt',
-          'updatedAt',
-          'userId',
-          'lastUpdate',
-        ],
       },
     });
   }

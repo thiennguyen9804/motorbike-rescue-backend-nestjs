@@ -20,6 +20,58 @@ export class DevicesService extends TypeOrmCrudService<DeviceEntity> {
     super(repo);
   }
 
+  async scanNearbyDevices({
+    latitude,
+    longitude,
+    radius,
+    page = 1,
+    limit = 10,
+  }: {
+    latitude: number;
+    longitude: number;
+    radius: number;
+    page?: number;
+    limit?: number;
+  }) {
+    // Convert radius from meters to degrees (approximate)
+    // 1 degree is approximately 111,320 meters at the equator
+    const radiusInDegrees = radius / 111320;
+
+    // Create a point from the given coordinates
+    const point = `ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326)`;
+
+    // Get total count of devices within radius
+    const total = await this.repo
+      .createQueryBuilder('device')
+      .where(`ST_DWithin(device.position, ${point}, :radius)`, {
+        radius: radiusInDegrees,
+      })
+      // .andWhere('device.status = :status', { status: DeviceStatus.ONLINE })
+      .getCount();
+
+    // Find devices within the radius with pagination
+    const devices = await this.repo
+      .createQueryBuilder('device')
+      .leftJoinAndSelect('device.user', 'user')
+      .where(`ST_DWithin(device.position, ${point}, :radius)`, {
+        radius: radiusInDegrees,
+      })
+      // .andWhere('device.status = :status', { status: DeviceStatus.ONLINE })
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getMany();
+
+
+
+    return {
+      data: devices,
+      count: devices.length,
+      total,
+      page,
+      pageCount: Math.ceil(total / limit),
+    };
+  }
+
   async socketUpdate(id: number, payload: UpdateDevicePinDto) {
     const queryRunner: QueryRunner =
       this.repo.manager.connection.createQueryRunner();
@@ -137,7 +189,7 @@ export class DevicesService extends TypeOrmCrudService<DeviceEntity> {
     );
 
     this.mqttService.publicMessage(`device/${newDevice.id}`, {
-   
+
     });
 
     return newDevice;
