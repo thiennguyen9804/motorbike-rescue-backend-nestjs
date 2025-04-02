@@ -4,4 +4,10 @@
 import { PartialType } from '@nestjs/swagger';
 import { CreateDeviceDto } from './create-device.dto';
 
-export class UpdatedeviceDto extends PartialType(CreateDeviceDto) {}
+export class UpdatedeviceDto extends PartialType(CreateDeviceDto) { }
+export class UpdateDevicePinDto {
+    id: number;
+}
+export class UpdateDeviceSensorDto extends UpdateDevicePinDto {
+    id: number;
+}

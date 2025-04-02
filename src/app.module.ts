@@ -18,6 +18,9 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 import { AllConfigType } from './config/config.type';
 import { SessionModule } from './session/session.module';
 import { MailerModule } from './mailer/mailer.module';
+import { DevicesModule } from './devices/devices.module';
+import { SocketIoGateway } from './socket-io/socket-io.gateway';
+import { CheckDeviceService } from './cron/check-device.service';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -26,11 +29,9 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   },
 });
 
-import { devicesModule } from './devices/devices.module';
-
 @Module({
   imports: [
-    devicesModule,
+    DevicesModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [databaseConfig, authConfig, appConfig, mailConfig, fileConfig],
@@ -67,6 +68,9 @@ import { devicesModule } from './devices/devices.module';
     MailModule,
     MailerModule,
     HomeModule,
+    
   ],
+  providers: [SocketIoGateway, CheckDeviceService],
+
 })
 export class AppModule {}
