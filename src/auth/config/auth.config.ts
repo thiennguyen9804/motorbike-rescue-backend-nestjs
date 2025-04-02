@@ -1,6 +1,6 @@
 import { registerAs } from '@nestjs/config';
 
-import { IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 import validateConfig from '../../utils/validate-config';
 import { AuthConfig } from './auth-config.type';
 import ms from 'ms';
@@ -29,6 +29,14 @@ class EnvironmentVariablesValidator {
 
   @IsString()
   AUTH_CONFIRM_EMAIL_TOKEN_EXPIRES_IN: string;
+
+  @IsString()
+  @IsOptional()
+  SWAGGER_USERNAME: string;
+
+  @IsString()
+  @IsOptional()
+  SWAGGER_PASSWORD: string;
 }
 
 export default registerAs<AuthConfig>('auth', () => {
@@ -42,7 +50,8 @@ export default registerAs<AuthConfig>('auth', () => {
     forgotSecret: process.env.AUTH_FORGOT_SECRET,
     forgotExpires: process.env.AUTH_FORGOT_TOKEN_EXPIRES_IN as ms.StringValue,
     confirmEmailSecret: process.env.AUTH_CONFIRM_EMAIL_SECRET,
-    confirmEmailExpires: process.env
-      .AUTH_CONFIRM_EMAIL_TOKEN_EXPIRES_IN as ms.StringValue,
+    confirmEmailExpires: process.env.AUTH_CONFIRM_EMAIL_TOKEN_EXPIRES_IN as ms.StringValue,
+    swaggerUsername: process.env.SWAGGER_USERNAME,
+    swaggerPassword: process.env.SWAGGER_PASSWORD,
   };
 });

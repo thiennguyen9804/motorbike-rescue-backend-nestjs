@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { useContainer } from 'class-validator';
+import basicAuth from 'express-basic-auth';
 import { AppModule } from './app.module';
 import validationOptions from './utils/validation-options';
 import { AllConfigType } from './config/config.type';
@@ -44,6 +45,20 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, options);
+
+  // Configure Swagger authentication
+  const users = {};
+  users[configService.getOrThrow('auth.swaggerUsername', { infer: true })] =
+    configService.getOrThrow('auth.swaggerPassword', { infer: true });
+
+  app.use(
+    '/docs',
+    basicAuth({
+      challenge: true,
+      users,
+    }),
+  );
+
   SwaggerModule.setup('docs', app, document);
 
   await app.listen(configService.getOrThrow('app.port', { infer: true }));
