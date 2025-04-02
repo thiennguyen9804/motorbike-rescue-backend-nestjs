@@ -41,13 +41,6 @@ import { ScanDevicesDto } from './dto/scan-devices.dto';
     join: {
       user: { eager: true },
     },
-    filter: [
-      {
-        field: 'role',
-        operator: 'eq',
-        value: '0',
-      },
-    ],
   },
 
   routes: {
