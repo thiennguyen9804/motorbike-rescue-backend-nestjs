@@ -68,9 +68,7 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
     MailModule,
     MailerModule,
     HomeModule,
-    
   ],
   providers: [SocketIoGateway, CheckDeviceService],
-
 })
 export class AppModule {}

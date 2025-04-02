@@ -10,4 +10,4 @@ import { ConfigModule } from '@nestjs/config';
   providers: [DeviceSeedService],
   exports: [DeviceSeedService],
 })
-export class deviceSeedModule { }
+export class deviceSeedModule {}

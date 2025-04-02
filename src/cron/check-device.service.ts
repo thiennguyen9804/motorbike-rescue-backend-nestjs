@@ -2,10 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In, LessThan } from 'typeorm';
-import {
-  DeviceEntity,
-
-} from '../devices/infrastructure/persistence/relational/entities/device.entity';
+import { DeviceEntity } from '../devices/infrastructure/persistence/relational/entities/device.entity';
 import dayjs from 'dayjs';
 import { info } from 'console';
 import { SocketIoGateway } from '../socket-io/socket-io.gateway';
@@ -17,7 +14,7 @@ export class CheckDeviceService {
     @InjectRepository(DeviceEntity)
     private readonly deviceRepository: Repository<DeviceEntity>,
     private readonly socketIoGateway: SocketIoGateway,
-  ) { }
+  ) {}
 
   @Cron(CronExpression.EVERY_5_MINUTES)
   async handleEvery5Minutes() {

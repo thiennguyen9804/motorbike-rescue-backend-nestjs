@@ -1,4 +1,4 @@
-import { Controller, ForbiddenException, Get, Request, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Request, UseGuards, Query } from '@nestjs/common';
 import {
   Crud,
   CrudController,
@@ -60,7 +60,7 @@ export class DevicesController implements CrudController<DeviceEntity> {
   constructor(
     public service: DevicesService,
     @InjectRepository(DeviceEntity) public repo: Repository<DeviceEntity>,
-  ) { }
+  ) {}
 
   get base(): CrudController<DeviceEntity> {
     return this;

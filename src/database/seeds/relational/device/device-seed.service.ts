@@ -15,21 +15,28 @@ export class DeviceSeedService {
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
   async run() {
     await this.repository.delete({});
 
-    const adminMqttUser = await this.configService.getOrThrow('app.mqttUser');
-    const adminMqttPassword = await this.configService.getOrThrow('app.mqttPass');
+    const adminMqttUser = await this.configService.getOrThrow('app.mqttUser', {
+      infer: true,
+    });
+    const adminMqttPassword = await this.configService.getOrThrow(
+      'app.mqttPass',
+      { infer: true },
+    );
 
-    await (this.repository.create({
-      name: 'Admin',
-      userId: 1,
-      deviceKey: adminMqttUser,
-      deviceToken: adminMqttPassword,
-      role: DeviceRole.ADMIN
-    })).save();
+    await this.repository
+      .create({
+        name: 'Admin',
+        userId: 1,
+        deviceKey: adminMqttUser,
+        deviceToken: adminMqttPassword,
+        role: DeviceRole.ADMIN,
+      })
+      .save();
 
     const users = await this.userRepository.find({});
     const userIds = users.map((user) => user.id);

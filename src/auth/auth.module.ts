@@ -22,4 +22,4 @@ import { UsersModule } from '../users/users.module';
   providers: [AuthService, JwtStrategy, JwtRefreshStrategy, AnonymousStrategy],
   exports: [AuthService, JwtModule],
 })
-export class AuthModule { }
+export class AuthModule {}

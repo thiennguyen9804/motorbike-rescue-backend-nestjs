@@ -20,4 +20,4 @@ import { SocketIoModule } from '../socket-io/socket-io.module';
   providers: [DevicesService],
   exports: [DevicesService, TypeOrmModule],
 })
-export class DevicesModule { }
+export class DevicesModule {}

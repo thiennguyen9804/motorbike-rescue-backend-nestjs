@@ -7,7 +7,6 @@ import {
   UpdateDateColumn,
   BeforeInsert,
   BeforeUpdate,
-  AfterInsert,
 } from 'typeorm';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
 import { UserEntity } from '../../../../../users/infrastructure/persistence/relational/entities/user.entity';

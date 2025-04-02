@@ -5,7 +5,6 @@ import { DevicesModule } from '../devices/devices.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from '../auth/auth.module';
 import { MqttModule } from '../mqtt/mqtt.module';
-import { JwtModule, JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [

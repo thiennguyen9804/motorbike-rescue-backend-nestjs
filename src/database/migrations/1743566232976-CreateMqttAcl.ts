@@ -1,9 +1,8 @@
-import { MigrationInterface, QueryRunner } from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class CreateMqttAcl1743566232976 implements MigrationInterface {
-
-    public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
             CREATE TABLE "mqtt_acl" (
                 "id" SERIAL PRIMARY KEY,
                 "topic" VARCHAR NOT NULL,
@@ -13,8 +12,8 @@ export class CreateMqttAcl1743566232976 implements MigrationInterface {
             );
         `);
 
-        // Tạo function để tự động thêm mqtt_acl
-        await queryRunner.query(`
+    // Tạo function để tự động thêm mqtt_acl
+    await queryRunner.query(`
             CREATE FUNCTION create_mqtt_acl_for_device() RETURNS TRIGGER AS $$
             BEGIN
                 INSERT INTO mqtt_acl (topic, rw, "deviceId") VALUES
@@ -25,30 +24,29 @@ export class CreateMqttAcl1743566232976 implements MigrationInterface {
             $$ LANGUAGE plpgsql;
         `);
 
-        // Tạo trigger cho mqtt_acl
-        await queryRunner.query(`
+    // Tạo trigger cho mqtt_acl
+    await queryRunner.query(`
             CREATE TRIGGER trigger_create_mqtt_acl
             AFTER INSERT ON device
             FOR EACH ROW
             EXECUTE FUNCTION create_mqtt_acl_for_device();
         `);
-    }
+  }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-        // Drop trigger first
-        await queryRunner.query(`
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    // Drop trigger first
+    await queryRunner.query(`
             DROP TRIGGER IF EXISTS trigger_create_mqtt_acl ON device;
         `);
 
-        // Drop function
-        await queryRunner.query(`
+    // Drop function
+    await queryRunner.query(`
             DROP FUNCTION IF EXISTS create_mqtt_acl_for_device();
         `);
 
-        // Drop table
-        await queryRunner.query(`
+    // Drop table
+    await queryRunner.query(`
             DROP TABLE IF EXISTS mqtt_acl;
         `);
-    }
-
+  }
 }

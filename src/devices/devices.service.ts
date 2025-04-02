@@ -8,15 +8,20 @@ import { SocketIoGateway } from '../socket-io/socket-io.gateway';
 import { info } from 'ps-logger';
 import { CrudRequest } from '@dataui/crud';
 import { DeviceStatus } from './domain/device-status.enum';
-import { UpdateDevicePinDto, UpdateDeviceSensorDto } from './dto/update-device.dto';
+import {
+  UpdateDevicePinDto,
+  UpdateDeviceSensorDto,
+} from './dto/update-device.dto';
 
 @Injectable()
 export class DevicesService extends TypeOrmCrudService<DeviceEntity> {
-  constructor(@InjectRepository(DeviceEntity) repo: Repository<DeviceEntity>,
+  constructor(
+    @InjectRepository(DeviceEntity) repo: Repository<DeviceEntity>,
     @Inject(forwardRef(() => MqttService))
     private mqttService: MqttService,
     @Inject(forwardRef(() => SocketIoGateway))
-    private socketIoGateway: SocketIoGateway,) {
+    private socketIoGateway: SocketIoGateway,
+  ) {
     super(repo);
   }
 
@@ -61,8 +66,6 @@ export class DevicesService extends TypeOrmCrudService<DeviceEntity> {
       .take(limit)
       .getMany();
 
-
-
     return {
       data: devices,
       count: devices.length,
@@ -89,17 +92,12 @@ export class DevicesService extends TypeOrmCrudService<DeviceEntity> {
         throw new Error('Device not found');
       }
 
-      if (
-        true
-      ) {
+      if (true) {
         info(`Device updated: ${JSON.stringify(payload)}`);
 
         await queryRunner.manager.update(DeviceEntity, id, payload);
 
-        this.mqttService.publicMessage(`device/${id}`, {
-
-
-        });
+        this.mqttService.publicMessage(`device/${id}`, {});
 
         const newDevice = await queryRunner.manager.findOne(DeviceEntity, {
           where: { id },
@@ -111,15 +109,16 @@ export class DevicesService extends TypeOrmCrudService<DeviceEntity> {
           },
         });
 
-        this.socketIoGateway.emitToRoom(`device/${id}`, 'device_data', newDevice);
-
+        this.socketIoGateway.emitToRoom(
+          `device/${id}`,
+          'device_data',
+          newDevice,
+        );
 
         await queryRunner.commitTransaction();
 
         return payload;
       }
-
-
 
       await queryRunner.commitTransaction();
       return false;
@@ -188,9 +187,7 @@ export class DevicesService extends TypeOrmCrudService<DeviceEntity> {
       newDevice,
     );
 
-    this.mqttService.publicMessage(`device/${newDevice.id}`, {
-
-    });
+    this.mqttService.publicMessage(`device/${newDevice.id}`, {});
 
     return newDevice;
   }
