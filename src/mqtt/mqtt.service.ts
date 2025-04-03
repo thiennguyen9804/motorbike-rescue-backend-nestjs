@@ -41,8 +41,6 @@ export class MqttService implements OnModuleInit {
       reconnectPeriod: 1000,
     });
 
-    console.log(mqttHost, mqttPort, mqttUser, mqttPass);
-
     this.mqttClient.on('connect', () => {
       info('MQTT - Connected');
 
