@@ -33,16 +33,14 @@ export class DeviceEntity extends EntityRelationalHelper {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   lastUpdate: Date;
 
-  @Column({ type: 'int', default: DeviceStatus.OFFLINE })
-  @Transform(
-    ({ value }) => {
-      if (typeof value === 'string') {
-        return value === 'online' ? DeviceStatus.ONLINE : DeviceStatus.OFFLINE;
-      }
-      return DeviceStatusMap[value as DeviceStatus] || 'offline';
+  @Column({
+    type: 'int',
+    default: DeviceStatus.OFFLINE,
+    transformer: {
+      to: (value: string) => DeviceStatus[value.toUpperCase()] ?? DeviceStatus.OFFLINE,
+      from: (value: number) => DeviceStatusMap[value as DeviceStatus],
     },
-    { toPlainOnly: true },
-  )
+  })
   status: number;
 
   @Column('geometry', { spatialFeatureType: 'Point', srid: 4326 })
