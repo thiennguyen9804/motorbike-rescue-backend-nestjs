@@ -53,7 +53,7 @@ export class DevicesController implements CrudController<DeviceEntity> {
   constructor(
     public service: DevicesService,
     @InjectRepository(DeviceEntity) public repo: Repository<DeviceEntity>,
-  ) {}
+  ) { }
 
   get base(): CrudController<DeviceEntity> {
     return this;
@@ -73,29 +73,16 @@ export class DevicesController implements CrudController<DeviceEntity> {
     const user = request.user;
     const userId: number = user.id;
     const userRoleId: number = user.role.id;
-    const adminFilter: SCondition = { role: { $eq: DeviceRole.DEVICE } };
-    let andSearch = req.parsed.search.$and;
 
-    if (userRoleId !== RoleEnum.admin) {
-      const userIdFilter: SCondition = { userId: { $eq: userId } };
-
-      if (req.parsed.search && '$and' in req.parsed.search) {
-        andSearch = [
-          ...(req.parsed.search.$and || []),
-          userIdFilter,
-          adminFilter,
-        ];
-      } else {
-        andSearch = [userIdFilter, adminFilter];
-      }
-    }
+    const searchFilters = this.createSearchFilters(req.parsed.search, userId, userRoleId);
+    req.parsed.search = { $and: searchFilters };
 
     return await this.service.getMany({
       ...req,
       parsed: {
         ...req.parsed,
         search: {
-          $and: andSearch || [],
+          $and: searchFilters || [],
         },
       },
     });
@@ -143,5 +130,28 @@ export class DevicesController implements CrudController<DeviceEntity> {
     @ParsedRequest() req: CrudRequest,
   ): Promise<void | DeviceEntity> {
     return await this.service.deleteOne(req);
+  }
+
+  private createSearchFilters(
+    parsedSearch: any,
+    userId: number,
+    userRoleId: number,
+  ): SCondition[] {
+    const filters: SCondition[] = [];
+    
+    // Add device role filter
+    filters.push({ role: { $eq: DeviceRole.DEVICE } });
+
+    // Add user-specific filter for non-admin users
+    if (userRoleId !== RoleEnum.admin) {
+      filters.push({ userId: { $eq: userId } });
+    }
+
+    // Add any existing search conditions
+    if (parsedSearch?.$and) {
+      filters.push(...parsedSearch.$and);
+    }
+
+    return filters;
   }
 }

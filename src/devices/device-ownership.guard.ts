@@ -11,7 +11,7 @@ import { DeviceRole } from './domain/device-role.enum';
 
 @Injectable()
 export class DeviceOwnershipGuard implements CanActivate {
-  constructor(private readonly devicesService: DevicesService) {}
+  constructor(private readonly devicesService: DevicesService) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -24,7 +24,6 @@ export class DeviceOwnershipGuard implements CanActivate {
 
     const userId: number = user.id;
     const userRoleId: number = user.role.id;
-
     const device = await this.devicesService.findOne({
       where: { id: Number(deviceId), role: DeviceRole.DEVICE },
       join: {

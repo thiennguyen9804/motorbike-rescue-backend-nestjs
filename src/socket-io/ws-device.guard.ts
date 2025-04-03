@@ -9,13 +9,14 @@ import { DevicesService } from '../devices/devices.service';
 import { Socket } from 'socket.io';
 import { error } from 'ps-logger';
 import { RoleEnum } from '../roles/roles.enum';
+import { DeviceRole } from '../devices/domain/device-role.enum';
 
 @Injectable()
 export class WsDeviceGuard implements CanActivate {
   constructor(
     @Inject(forwardRef(() => DevicesService))
     private readonly devicesService: DevicesService,
-  ) {}
+  ) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const client: Socket = context.switchToWs().getClient();
@@ -30,7 +31,7 @@ export class WsDeviceGuard implements CanActivate {
     const role = client.data.user.role;
 
     const device = await this.devicesService.findOne({
-      where: { id: data.deviceId },
+      where: { id: data.deviceId, role: DeviceRole.DEVICE },
       join: {
         alias: 'device',
         leftJoinAndSelect: {
