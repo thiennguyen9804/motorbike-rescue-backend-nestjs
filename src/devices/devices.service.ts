@@ -156,6 +156,7 @@ export class DevicesService extends TypeOrmCrudService<DeviceEntity> {
       await queryRunner.commitTransaction();
 
       info(`Device updated: ${JSON.stringify(newDevice)}`);
+      this.mqttService.publicMessage(`device/${id}`, { asdasd: "!23123" });
 
       this.socketIoGateway.emitToRoom(`device/${id}`, 'device_data', newDevice);
 

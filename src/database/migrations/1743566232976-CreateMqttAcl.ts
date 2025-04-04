@@ -18,7 +18,9 @@ export class CreateMqttAcl1743566232976 implements MigrationInterface {
             BEGIN
                 INSERT INTO mqtt_acl (topic, rw, "deviceId") VALUES
                 (concat('device/', NEW.id), 4, NEW.id),
+                (concat('device/', NEW.id), 1, NEW.id),
                 (concat('device/', NEW.id, '/update'), 2, NEW.id);
+
                 RETURN NEW;
             END;
             $$ LANGUAGE plpgsql;
