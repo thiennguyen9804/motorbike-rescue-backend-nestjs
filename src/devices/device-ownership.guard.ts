@@ -11,7 +11,7 @@ import { DeviceRole } from './domain/device-role.enum';
 
 @Injectable()
 export class DeviceOwnershipGuard implements CanActivate {
-  constructor(private readonly devicesService: DevicesService) { }
+  constructor(private readonly devicesService: DevicesService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();

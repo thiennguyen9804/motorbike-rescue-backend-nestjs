@@ -16,7 +16,7 @@ export class WsDeviceGuard implements CanActivate {
   constructor(
     @Inject(forwardRef(() => DevicesService))
     private readonly devicesService: DevicesService,
-  ) { }
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const client: Socket = context.switchToWs().getClient();

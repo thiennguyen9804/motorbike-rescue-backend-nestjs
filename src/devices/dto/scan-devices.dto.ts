@@ -45,4 +45,16 @@ export class ScanDevicesDto {
   @Min(1)
   @Max(100)
   limit?: number = 10;
+
+  @ApiProperty({
+    description: 'Radius default is 10000, admin can scan up to 100000',
+    example: 10000,
+    required: false,
+  })
+  @IsNumber()
+  @Type(() => Number)
+  @IsOptional()
+  @Min(1)
+  @Max(100000)
+  radius: number = 10000;
 }

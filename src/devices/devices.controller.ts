@@ -53,15 +53,20 @@ export class DevicesController implements CrudController<DeviceEntity> {
   constructor(
     public service: DevicesService,
     @InjectRepository(DeviceEntity) public repo: Repository<DeviceEntity>,
-  ) { }
+  ) {}
 
   get base(): CrudController<DeviceEntity> {
     return this;
   }
 
   @Get('scan')
-  async scanDevices(@Query() query: ScanDevicesDto) {
-    return this.service.scanNearbyDevices({ ...query, radius: 10000 });
+  async scanDevices(@Query() query: ScanDevicesDto, @Request() request: any) {
+    const userRoleId: number = request.user.role.id;
+
+    return this.service.scanNearbyDevices({
+      ...query,
+      radius: userRoleId === RoleEnum.admin ? query.radius : 10000,
+    });
   }
 
   @Override('getManyBase')
@@ -74,7 +79,11 @@ export class DevicesController implements CrudController<DeviceEntity> {
     const userId: number = user.id;
     const userRoleId: number = user.role.id;
 
-    const searchFilters = this.createSearchFilters(req.parsed.search, userId, userRoleId);
+    const searchFilters = this.createSearchFilters(
+      req.parsed.search,
+      userId,
+      userRoleId,
+    );
     req.parsed.search = { $and: searchFilters };
 
     return await this.service.getMany({
@@ -138,7 +147,7 @@ export class DevicesController implements CrudController<DeviceEntity> {
     userRoleId: number,
   ): SCondition[] {
     const filters: SCondition[] = [];
-    
+
     // Add device role filter
     filters.push({ role: { $eq: DeviceRole.DEVICE } });
 
