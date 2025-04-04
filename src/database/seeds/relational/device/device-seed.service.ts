@@ -55,7 +55,8 @@ export class DeviceSeedService {
         userId: userIds[Math.floor(Math.random() * userIds.length)],
         deviceKey: crypto.randomBytes(16).toString('hex'),
         deviceToken: crypto.randomBytes(16).toString('hex'),
-        role: DeviceRole.DEVICE
+        role: DeviceRole.DEVICE,
+
       });
     });
 
@@ -64,7 +65,7 @@ export class DeviceSeedService {
     for (const device of savedDevices) {
       const lng = areaCoordinates.lng + (Math.random() - 0.01) * areaCoordinates.radius / 111320;
       const lat = areaCoordinates.lat + (Math.random() - 0.01) * areaCoordinates.radius / 111320;
-      
+
       await this.repository
         .createQueryBuilder()
         .update(DeviceEntity)

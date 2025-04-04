@@ -23,6 +23,7 @@ import { DeviceRole } from './domain/device-role.enum';
 import { RolesGuard } from '../roles/roles.guard';
 import { Roles } from '../roles/roles.decorator';
 import { ScanDevicesDto } from './dto/scan-devices.dto';
+import { DeviceStatusStr } from './domain/device-status.enum';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'), RolesGuard)
@@ -53,7 +54,7 @@ export class DevicesController implements CrudController<DeviceEntity> {
   constructor(
     public service: DevicesService,
     @InjectRepository(DeviceEntity) public repo: Repository<DeviceEntity>,
-  ) {}
+  ) { }
 
   get base(): CrudController<DeviceEntity> {
     return this;
@@ -66,6 +67,7 @@ export class DevicesController implements CrudController<DeviceEntity> {
     return this.service.scanNearbyDevices({
       ...query,
       radius: userRoleId === RoleEnum.admin ? query.radius : 10000,
+      status: userRoleId === RoleEnum.admin ? query.status : DeviceStatusStr.ONLINE,
     });
   }
 
@@ -118,7 +120,6 @@ export class DevicesController implements CrudController<DeviceEntity> {
   @Get(':id/password')
   @UseGuards(DeviceOwnershipGuard)
   async getDevicePassword(
-    @ParsedRequest() req: CrudRequest,
     @Request() request: any,
   ): Promise<DeviceEntity> {
     const deviceToken = crypto.randomBytes(16).toString('hex');

@@ -6,7 +6,7 @@ import { DeviceEntity } from '../devices/infrastructure/persistence/relational/e
 import dayjs from 'dayjs';
 import { info } from 'console';
 import { SocketIoGateway } from '../socket-io/socket-io.gateway';
-import { DeviceStatus } from '../devices/domain/device-status.enum';
+import { DeviceStatus, DeviceStatusStr } from '../devices/domain/device-status.enum';
 
 @Injectable()
 export class CheckDeviceService {
@@ -25,7 +25,7 @@ export class CheckDeviceService {
     const offlineDevices = await this.deviceRepository.find({
       where: {
         updatedAt: LessThan(fiveMinutesAgo),
-        status: DeviceStatus.ONLINE,
+        status: DeviceStatusStr.ONLINE,
       },
       join: { alias: 'device', leftJoinAndSelect: { user: 'device.user' } },
     });
@@ -33,7 +33,7 @@ export class CheckDeviceService {
     if (offlineDevices.length > 0) {
       await this.deviceRepository.update(
         { id: In(offlineDevices.map((device) => device.id)) },
-        { status: DeviceStatus.OFFLINE },
+        { status: DeviceStatusStr.OFFLINE },
       );
 
       for (const device of offlineDevices) {

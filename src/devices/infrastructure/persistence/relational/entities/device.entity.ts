@@ -17,6 +17,7 @@ import crypto from 'crypto';
 import {
   DeviceStatus,
   DeviceStatusMap,
+  DeviceStatusStr,
 } from '../../../../domain/device-status.enum';
 import { DeviceRole, DeviceRoleMap } from '../../../../domain/device-role.enum';
 
@@ -42,7 +43,7 @@ export class DeviceEntity extends EntityRelationalHelper {
       from: (value: number) => DeviceStatusMap[value as DeviceStatus],
     },
   })
-  status: number;
+  status: DeviceStatusStr;
 
   @Column('geometry', { spatialFeatureType: 'Point', srid: 4326 })
   position: PostGISPoint;

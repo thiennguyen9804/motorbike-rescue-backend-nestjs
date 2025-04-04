@@ -3,7 +3,12 @@ export enum DeviceStatus {
   ONLINE = 1,
 }
 
+export enum DeviceStatusStr {
+  OFFLINE = 'offline',
+  ONLINE = 'online',
+}
+
 export const DeviceStatusMap = {
-  [DeviceStatus.OFFLINE]: 'offline',
-  [DeviceStatus.ONLINE]: 'online',
+  [DeviceStatus.OFFLINE]: DeviceStatusStr.OFFLINE,
+  [DeviceStatus.ONLINE]: DeviceStatusStr.ONLINE,
 };

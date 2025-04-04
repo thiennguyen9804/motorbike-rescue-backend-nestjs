@@ -11,18 +11,6 @@ export class CreateDeviceDto {
   @IsNotEmpty()
   name: string;
 
-  // @ApiProperty({
-  //   type: String,
-  //   description: 'Device status (offline/online)',
-  //   default: 'offline',
-  //   example: 'online',
-  //   enum: ['offline', 'online']
-  // })
-  // @IsString()
-  // @IsEnum(['offline', 'online'])
-  // @IsOptional()
-  // status?: string;
-
   @ApiProperty({
     type: Number,
     description: 'Associated user ID',

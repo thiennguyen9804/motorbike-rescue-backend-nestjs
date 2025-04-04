@@ -1,6 +1,7 @@
-import { IsNumber, IsOptional, Max, Min } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { DeviceStatusStr } from '../domain/device-status.enum';
 
 export class ScanDevicesDto {
   @ApiProperty({
@@ -12,6 +13,18 @@ export class ScanDevicesDto {
   @Min(-90)
   @Max(90)
   latitude: number;
+
+  @ApiProperty({
+    type: String,
+    description: 'Device status (offline/online)',
+    default: DeviceStatusStr.ONLINE,
+    example: DeviceStatusStr.ONLINE,
+    enum: [DeviceStatusStr.OFFLINE, DeviceStatusStr.ONLINE]
+  })
+  @IsString()
+  @IsEnum(DeviceStatusStr)
+  @IsOptional()
+  status?: DeviceStatusStr;
 
   @ApiProperty({
     description: 'Longitude of the device',

@@ -7,11 +7,13 @@ import { MqttService } from '../mqtt/mqtt.service';
 import { SocketIoGateway } from '../socket-io/socket-io.gateway';
 import { info } from 'ps-logger';
 import { CrudRequest } from '@dataui/crud';
-import { DeviceStatus } from './domain/device-status.enum';
+import { DeviceStatusStr } from './domain/device-status.enum';
 import {
   UpdateDevicePinDto,
   UpdateDeviceSensorDto,
 } from './dto/update-device.dto';
+import { DeviceRole } from './domain/device-role.enum';
+import { ScanDevicesDto } from './dto/scan-devices.dto';
 
 @Injectable()
 export class DevicesService extends TypeOrmCrudService<DeviceEntity> {
@@ -31,13 +33,8 @@ export class DevicesService extends TypeOrmCrudService<DeviceEntity> {
     radius,
     page = 1,
     limit = 10,
-  }: {
-    latitude: number;
-    longitude: number;
-    radius: number;
-    page?: number;
-    limit?: number;
-  }) {
+    status,
+  }: ScanDevicesDto) {
     // Convert radius from meters to degrees (approximate)
     // 1 degree is approximately 111,320 meters at the equator
     const radiusInDegrees = radius / 111320;
@@ -51,7 +48,8 @@ export class DevicesService extends TypeOrmCrudService<DeviceEntity> {
       .where(`ST_DWithin(device.position, ${point}, :radius)`, {
         radius: radiusInDegrees,
       })
-      // .andWhere('device.status = :status', { status: DeviceStatus.ONLINE })
+      .andWhere('role = :role', { role: DeviceRole.DEVICE })
+      .andWhere('device.status = :status', { status: status })
       .getCount();
 
     // Find devices within the radius with pagination
@@ -61,7 +59,8 @@ export class DevicesService extends TypeOrmCrudService<DeviceEntity> {
       .where(`ST_DWithin(device.position, ${point}, :radius)`, {
         radius: radiusInDegrees,
       })
-      // .andWhere('device.status = :status', { status: DeviceStatus.ONLINE })
+      .andWhere('role = :role', { role: DeviceRole.DEVICE })
+      .andWhere('device.status = :status', { status: status })
       .skip((page - 1) * limit)
       .take(limit)
       .getMany();
@@ -138,18 +137,9 @@ export class DevicesService extends TypeOrmCrudService<DeviceEntity> {
     await queryRunner.startTransaction();
 
     try {
-      const existingDevice = await queryRunner.manager.findOne(DeviceEntity, {
-        where: { id },
-        lock: { mode: 'pessimistic_write' },
-      });
-
-      if (!existingDevice) {
-        throw new Error('Device not found');
-      }
-
       await queryRunner.manager.update(DeviceEntity, id, {
         ...device,
-        status: DeviceStatus.ONLINE,
+        status: DeviceStatusStr.ONLINE,
         lastUpdate: new Date(),
       });
 
