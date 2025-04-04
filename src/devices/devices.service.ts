@@ -7,7 +7,7 @@ import { MqttService } from '../mqtt/mqtt.service';
 import { SocketIoGateway } from '../socket-io/socket-io.gateway';
 import { info } from 'ps-logger';
 import { CrudRequest } from '@dataui/crud';
-import { DeviceStatusStr } from './domain/device-status.enum';
+import { DeviceStatus, DeviceStatusStr } from './domain/device-status.enum';
 import {
   UpdateDevicePinDto,
   UpdateDeviceSensorDto,
@@ -49,7 +49,7 @@ export class DevicesService extends TypeOrmCrudService<DeviceEntity> {
         radius: radiusInDegrees,
       })
       .andWhere('role = :role', { role: DeviceRole.DEVICE })
-      .andWhere('device.status = :status', { status: status })
+      .andWhere('device.status = :status', { status: status ? DeviceStatus[status] : DeviceStatus.ONLINE })
       .getCount();
 
     // Find devices within the radius with pagination
@@ -60,7 +60,7 @@ export class DevicesService extends TypeOrmCrudService<DeviceEntity> {
         radius: radiusInDegrees,
       })
       .andWhere('role = :role', { role: DeviceRole.DEVICE })
-      .andWhere('device.status = :status', { status: status })
+      .andWhere('device.status = :status', { status: status ? DeviceStatus[status] : DeviceStatus.ONLINE })
       .skip((page - 1) * limit)
       .take(limit)
       .getMany();
@@ -156,7 +156,6 @@ export class DevicesService extends TypeOrmCrudService<DeviceEntity> {
       await queryRunner.commitTransaction();
 
       info(`Device updated: ${JSON.stringify(newDevice)}`);
-      this.mqttService.publicMessage(`device/${id}`, { asdasd: "!23123" });
 
       this.socketIoGateway.emitToRoom(`device/${id}`, 'device_data', newDevice);
 
