@@ -24,6 +24,7 @@ import { RolesGuard } from '../roles/roles.guard';
 import { Roles } from '../roles/roles.decorator';
 import { ScanDevicesDto } from './dto/scan-devices.dto';
 import { DeviceStatusStr } from './domain/device-status.enum';
+import bcrypt from 'bcryptjs';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'), RolesGuard)
@@ -122,10 +123,10 @@ export class DevicesController implements CrudController<DeviceEntity> {
   async getDevicePassword(
     @Request() request: any,
   ): Promise<DeviceEntity> {
-    const deviceToken = crypto.randomBytes(16).toString('hex');
+    const deviceToken = crypto.randomBytes(16).toString('hex')
 
     await this.repo.update(request.device.id, {
-      deviceToken: deviceToken,
+      deviceToken: await bcrypt.hash(deviceToken, 10),
     });
 
     return {

@@ -81,11 +81,4 @@ export class DeviceEntity extends EntityRelationalHelper {
       10,
     );
   }
-
-  @BeforeUpdate()
-  async hashDeviceTokenOnUpdate() {
-    if (this.deviceToken) {
-      this.deviceToken = await bcrypt.hash(this.deviceToken, 10);
-    }
-  }
 }
