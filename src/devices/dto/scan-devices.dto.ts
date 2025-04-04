@@ -55,6 +55,6 @@ export class ScanDevicesDto {
   @Type(() => Number)
   @IsOptional()
   @Min(1)
-  @Max(100000)
+  @Max(1000000)
   radius: number = 10000;
 }

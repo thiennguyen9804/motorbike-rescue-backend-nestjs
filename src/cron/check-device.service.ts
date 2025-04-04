@@ -14,7 +14,7 @@ export class CheckDeviceService {
     @InjectRepository(DeviceEntity)
     private readonly deviceRepository: Repository<DeviceEntity>,
     private readonly socketIoGateway: SocketIoGateway,
-  ) {}
+  ) { }
 
   @Cron(CronExpression.EVERY_5_MINUTES)
   async handleEvery5Minutes() {

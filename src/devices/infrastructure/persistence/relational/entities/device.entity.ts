@@ -38,7 +38,7 @@ export class DeviceEntity extends EntityRelationalHelper {
     default: DeviceStatus.OFFLINE,
     transformer: {
       to: (value: string) =>
-        DeviceStatus[value.toUpperCase()] ?? DeviceStatus.OFFLINE,
+        DeviceStatus[value ? value.toUpperCase() : 'OFFLINE'],
       from: (value: number) => DeviceStatusMap[value as DeviceStatus],
     },
   })
