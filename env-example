@@ -8,6 +8,7 @@ FRONTEND_DOMAIN=http://localhost:3000
 BACKEND_DOMAIN=http://localhost:3000
 
 MQTT_HOST=http://localhost:1883
+MQTT_PORT=1883
 MQTT_USER=admin
 MQTT_PASSWORD=sk4asdkawu2
 
