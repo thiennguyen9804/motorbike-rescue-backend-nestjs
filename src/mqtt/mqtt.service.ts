@@ -20,9 +20,6 @@ export class MqttService implements OnModuleInit {
     const mqttHost = this.configService.getOrThrow<string>('app.mqttHost', {
       infer: true,
     });
-    const mqttPort = this.configService.getOrThrow<number>('app.mqttPort', {
-      infer: true,
-    });
     const mqttUser = this.configService.getOrThrow<string>('app.mqttUser', {
       infer: true,
     });
@@ -30,10 +27,7 @@ export class MqttService implements OnModuleInit {
       infer: true,
     });
 
-    this.mqttClient = connect({
-      host: mqttHost,
-      port: mqttPort,
-      protocol: 'mqtt',
+    this.mqttClient = connect(mqttHost, {
       username: mqttUser,
       password: mqttPass,
       clientId,

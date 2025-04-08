@@ -7,10 +7,9 @@ APP_HEADER_LANGUAGE=x-custom-lang
 FRONTEND_DOMAIN=http://localhost:3000
 BACKEND_DOMAIN=http://localhost:3000
 
-MQTT_HOST=127.0.0.1
-MQTT_PORT=1883
+MQTT_HOST=http://localhost:1883
 MQTT_USER=admin
-MQTT_PASSWORD=password
+MQTT_PASSWORD=sk4asdkawu2
 
 SWAGGER_USERNAME=motobike
 SWAGGER_PASSWORD="laaal1122"
