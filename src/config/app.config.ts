@@ -54,6 +54,10 @@ class EnvironmentVariablesValidator {
 
   @IsString()
   @IsOptional()
+  MQTT_PROTOCOL: string;
+
+  @IsString()
+  @IsOptional()
   API_PREFIX: string;
 
   @IsString()
@@ -78,6 +82,7 @@ export default registerAs<AppConfig>('app', () => {
     mqttPort: process.env.MQTT_PORT ?? 1883,
     mqttUser: process.env.MQTT_USER,
     mqttPass: process.env.MQTT_PASSWORD,
+    mqttProtocol: process.env.MQTT_PROTOCOL ?? 'mqtt',
     port: process.env.APP_PORT
       ? parseInt(process.env.APP_PORT, 10)
       : process.env.PORT

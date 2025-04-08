@@ -1,6 +1,6 @@
 import { forwardRef, Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { connect, MqttClient } from 'mqtt';
+import { connect, MqttClient, MqttProtocol } from 'mqtt';
 import { error, info } from 'ps-logger';
 import { DevicesService } from '../devices/devices.service';
 import { DeviceEntity } from '../devices/infrastructure/persistence/relational/entities/device.entity';
@@ -13,11 +13,14 @@ export class MqttService implements OnModuleInit {
     private configService: ConfigService,
     @Inject(forwardRef(() => DevicesService))
     private deviceService: DevicesService,
-  ) {}
+  ) { }
 
   onModuleInit() {
     const clientId = `mqtt_${crypto.randomUUID()}`;
     const mqttHost = this.configService.getOrThrow<string>('app.mqttHost', {
+      infer: true,
+    });
+    const mqttPort = this.configService.getOrThrow<number>('app.mqttPort', {
       infer: true,
     });
     const mqttUser = this.configService.getOrThrow<string>('app.mqttUser', {
@@ -26,8 +29,14 @@ export class MqttService implements OnModuleInit {
     const mqttPass = this.configService.getOrThrow<string>('app.mqttPass', {
       infer: true,
     });
+    const mqttProtocol = this.configService.getOrThrow<string>('app.mqttProtocol', {
+      infer: true,
+    });
 
-    this.mqttClient = connect(mqttHost, {
+    this.mqttClient = connect({
+      host: mqttHost,
+      port: mqttPort,
+      protocol: mqttProtocol as MqttProtocol,
       username: mqttUser,
       password: mqttPass,
       clientId,

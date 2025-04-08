@@ -55,6 +55,7 @@ services:
       - ${APP_PORT}:${APP_PORT}
     depends_on:
       - postgres
+      - mosquitto
 
 volumes:
   boilerplate-db:
