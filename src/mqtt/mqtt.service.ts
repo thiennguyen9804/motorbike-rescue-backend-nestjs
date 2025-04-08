@@ -33,6 +33,7 @@ export class MqttService implements OnModuleInit {
     this.mqttClient = connect({
       host: mqttHost,
       port: mqttPort,
+      protocol: 'mqtt',
       username: mqttUser,
       password: mqttPass,
       clientId,
